@@ -12,11 +12,13 @@ I suggest use [docker](https://www.docker.com/).
 ### Configuration docker
 ```bash
 docker run -u root --volume .:/rvcc --rm -it registry.cn-hangzhou.aliyuncs.com/dailycoding/rvcc
-# Just need build once, next time just need run.
-docker build .
 ```
 ### Build 
 ```bash
 # Build
 make
+# Run
+make run
+# Clean
+make clean
 ```

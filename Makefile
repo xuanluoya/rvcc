@@ -1,13 +1,10 @@
-CC      = gcc
-CFLAGS  = -std=c11 -g -fno-common -Wall -Wno-switch
-
-SRCDIR  = src
-BUILDDIR= build
-
-SRCS    = $(wildcard $(SRCDIR)/*.c)
-OBJS    = $(SRCS:$(SRCDIR)/%.c=$(BUILDDIR)/%.o)
-
-TARGET  = $(BUILDDIR)/rvcc
+CC       = gcc
+CFLAGS   = -std=c11 -g -fno-common -Wall -Wno-switch
+SRCDIR   = src
+BUILDDIR = build
+SRCS     = $(wildcard $(SRCDIR)/*.c)
+OBJS     = $(SRCS:$(SRCDIR)/%.c=$(BUILDDIR)/%.o)
+TARGET   = $(BUILDDIR)/rvcc
 
 $(TARGET): $(OBJS)
 	@mkdir -p $(BUILDDIR)
