@@ -1,8 +1,50 @@
+/**
+ * @file main.c
+ * @brief Contains the program's entry and main function.
+ *
+ * This file achieved the main compiler function. */
+
+/** ------------------------------------------------------------
+ * Copyright © 2025 Xuanluo Qiu
+ * SPDX-License-Identifier: MIT
+ * -------------------------------------------------------------
+ * Project Name    : rvcc
+ * Project Authors : Xuanluo Qiu <xuanluo.qwq@gmail.com>
+ * Contributors    :   Nil Null  <nil@null.org>
+ * Created On      : <2025-5-18>
+ * Last Modified   : <2025-5-22>
+ *
+ * rvcc: A little cf cpmiler of risc-v
+ * ------------------------------------------------------------*/
+
 #include "rvcc.h"
 
+/**
+ * @brief The program's main entry.
+ *
+ * Achieved compiler function.
+ *
+ * @param[in] argc The number of command lin arguments
+ * @param[in] argv Point to an array of parameter strings
+ * @return int Program exit code. */
 int
-main ()
+main (int argc, char *argv[])
 {
-  printf ("Hello from risc-v!\n");
+  // Error handing.
+  if (argc != 2)
+    {
+      fprintf (stderr, "%s: invalid number of arguments", argv[0]);
+      return 1;
+    }
+
+  // Declare a main segment.
+  printf ("  .globl main\n");
+  // main section label.
+  printf ("main:\n");
+  // li is aliases of addi, load a immediate into the register.
+  printf ("  li a0, %d\n", atoi (argv[1]));
+  // ret is aliases od `jalr x0, x1, 0`,used of return subroutines
+  printf ("  ret\n");
+
   return 0;
 }
