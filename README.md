@@ -19,6 +19,8 @@ docker run -u root --volume .:/rvcc --rm -it registry.cn-hangzhou.aliyuncs.com/d
 make
 # Run
 make run
+# Test
+make test
 # Clean
 make clean
 ```
