@@ -4,19 +4,6 @@
  *
  * This file achieved the main compiler function. */
 
-/** ------------------------------------------------------------
- * Copyright © 2025 Xuanluo Qiu
- * SPDX-License-Identifier: MIT
- * -------------------------------------------------------------
- * Project Name    : rvcc
- * Project Authors : Xuanluo Qiu <xuanluo.qwq@gmail.com>
- * Contributors    :   Nil Null  <nil@null.org>
- * Created On      : <2025-5-18>
- * Last Modified   : <2025-5-22>
- *
- * rvcc: A little cf cpmiler of risc-v
- * ------------------------------------------------------------*/
-
 #include "rvcc.h"
 
 /**

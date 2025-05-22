@@ -4,6 +4,14 @@
 # Build
 build
 
+# Docs
+docs
+
+# tests
+*.s
+a.out
+tmp*
+
 # Prerequisites
 *.d
 

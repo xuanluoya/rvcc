@@ -1,0 +1,15 @@
+PROJECT_NAME           = "Project RVCC"
+PROJECT_NUMBER         = 0.0.1
+OUTPUT_LANGUAGE        = English
+
+INPUT                  = ./src ./README.md
+FILE_PATTERNS          = *.c *.h
+RECURSIVE              = YES
+INPUT_ENCODING         = UTF-8
+MARKDOWN_SUPPORT       = YES
+
+OUTPUT_DIRECTORY       = ./docs
+GENERATE_HTML          = YES
+HTML_OUTPUT            = html
+USE_MDFILE_AS_MAINPAGE = README.md
+HTML_EXTRA_STYLESHEET  = ./docs/css/doxygen-awesome.css

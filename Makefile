@@ -24,8 +24,16 @@ run: $(TARGET)
 test: rvcc
 	@bash ./tests/test.sh
 
+docs:
+	@git clone https://github.com/jothepro/doxygen-awesome-css.git ./docs/css
+	@doxygen
+
 clean:
 	@rm -rf $(BUILDDIR)
 	@rm -f *.s a.out ./tests/tmp*
+	@rm -rf docs
 
-.PHONY: run clean
+docker:
+	@docker run -u root --volume .:/rvcc --rm -it registry.cn-hangzhou.aliyuncs.com/dailycoding/rvcc
+
+.PHONY: run clean docs docker
