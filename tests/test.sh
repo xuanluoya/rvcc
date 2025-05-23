@@ -20,5 +20,6 @@ assert() {
 
 assert 0 0
 assert 242 242
+assert 4 '4-1+1'
 
 echo "OK"
