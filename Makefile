@@ -25,7 +25,7 @@ test: rvcc
 	@bash ./tests/test.sh
 
 docs:
-	@git clone https://github.com/jothepro/doxygen-awesome-css.git ./docs/css
+	@if [ ! -d docs ]; then git clone https://github.com/jothepro/doxygen-awesome-css.git ./docs/css; fi
 	@doxygen
 
 clean:

@@ -5,6 +5,7 @@
  * This file achieved the main compiler function. */
 
 #include "rvcc.h"
+#include <stdio.h>
 
 /**
  * @brief The program's main entry.
@@ -19,44 +20,36 @@ main (int argc, char *argv[])
 {
   if (argc != 2)
     {
-      fprintf (stderr, "%s: invalid number of arguments", argv[0]);
-      return 1;
+      error ("Usage: %s <expression>", argv[0]);
     }
 
-  // `p` save the script from command line.
-  char *p = argv[1];
+  // Analyze token
+  Token *tok = tokenize (argv[1]);
 
   // Declare a main segment.
   printf ("  .globl main\n");
   // main section label.
   printf ("main:\n");
+
   // li is aliases of addi, load a immediate into the register.
   // `strtol` will find the first number.
-  printf ("  li a0, %ld\n", strtol (p, &p, 10));
+  printf ("  li a0, %d\n", get_number (tok));
+  tok = tok->next;
 
-  // analysis `p`.
-  while (*p)
+  // Analyze
+  while (tok->kind != TK_EOF)
     {
-      if (*p == '+')
+      if (equal (tok, "+"))
         {
-          // skip symble
-          ++p;
-          // addi rd, rs1, imm => rd = rs1 + imm
-          printf ("  addi a0, a0, %ld\n", strtol (p, &p, 10));
+          tok = tok->next;
+          printf ("  addi a0, a0, %d\n", get_number (tok));
+          tok = tok->next;
           continue;
         }
-      else if (*p == '-')
-        {
-          ++p;
-          // rd = rs1 + (-imm)
-          printf ("  addi a0, a0, -%ld\n", strtol (p, &p, 10));
-          continue;
-        }
-      else
-        {
-          fprintf (stderr, "unexpected character: `%c`\n", *p);
-          return 1;
-        }
+
+      tok = skip (tok, "-");
+      printf ("  addi a0, a0, -%d\n", get_number (tok));
+      tok = tok->next;
     }
 
   // ret is aliases od `jalr x0, x1, 0`,used of return subroutines
@@ -64,3 +57,113 @@ main (int argc, char *argv[])
 
   return 0;
 }
+
+static void
+error (char *fmt, ...)
+{
+  va_list ap;
+  va_start (ap, fmt);
+  vfprintf (stderr, fmt, ap);
+  fprintf (stderr, "\n");
+  va_end (ap);
+  exit (1);
+}
+
+static Token *
+new_token (TokenKind kind, char *start, char *end)
+{
+  Token *tok = calloc (1, sizeof (Token));
+  tok->kind = kind;
+  tok->loc = start;
+  tok->len = end - start;
+  return tok;
+}
+
+static int
+get_number (Token *tok)
+{
+  if (tok->kind != TK_NUM)
+    error ("expect a number");
+  return tok->val;
+}
+
+static bool
+equal (Token *tok, char *str)
+{
+  return memcmp (tok->loc, str, tok->len) == 0 && str[tok->len] == '\0';
+};
+
+static Token *
+skip (Token *tok, char *str)
+{
+  if (!equal (tok, str))
+    error ("expect '%s'", str);
+  return tok->next;
+}
+
+static Token *
+tokenize (char *p)
+{
+  // (HEAD) -> 1 -> 2 -> 3
+  Token head = {};
+  Token *cur = &head;
+
+  while (*p)
+    {
+      // skip whitespace.
+      if (isspace (*p))
+        {
+          ++p;
+          continue;
+        }
+
+      // Analysis number.
+      if (isdigit (*p))
+        {
+          cur->next = new_token (TK_NUM, p, p);
+          cur = cur->next;
+          const char *oldptr = p;
+          cur->val = strtol (p, &p, 10);
+          cur->len = p - oldptr;
+          continue;
+        }
+
+      // Analysis identifier.
+      if (*p == '+' || *p == '-')
+        {
+          cur->next = new_token (TK_PUNCT, p, p + 1);
+          cur = cur->next;
+          ++p;
+          continue;
+        }
+
+      // Handing unrecognizable character.
+      error ("invalid token: %c", *p);
+    }
+
+  // Analysis end.
+  // Add EOF
+  cur->next = new_token (TK_EOF, p, p);
+
+  // Debug
+  // debug_token (head.next);
+
+  // return head -> cur 1 (next) -> 2  ...
+  return head.next;
+}
+
+// [NOTE]
+// * Function in rvcc.h:106.
+// * Debug function for token.
+/**
+static void
+debug_token (Token *tok)
+{
+  int tok_num = 0;
+  while (tok->kind != TK_EOF)
+    {
+      printf ("(Num: %d, Kind: %d, Val: %d)\n", tok_num, tok->kind,
+      tok->val); tok_num++; tok = tok->next;
+    }
+}
+*/

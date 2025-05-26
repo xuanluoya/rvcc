@@ -6,6 +6,9 @@ INPUT                  = ./src ./README.md
 FILE_PATTERNS          = *.c *.h
 RECURSIVE              = YES
 INPUT_ENCODING         = UTF-8
+EXTRACT_STATIC         = YES
+EXTRACT_ALL            = YES
+INTERNAL_DOCS          = YES
 MARKDOWN_SUPPORT       = YES
 
 OUTPUT_DIRECTORY       = ./docs
