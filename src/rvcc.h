@@ -42,13 +42,42 @@ typedef struct Token
   int len;            /**< Length of token. */
 } Token;
 
+// @brief Input's string.
+extern char *CurrentInput;
+
 /**
  * @brief Print an error message and exit.
  *
  * @param[in] fmt Format string for the error message.
  * @param[in] ... Additional arguments for the format string.
  */
-static void error (char *fmt, ...);
+void error (char *fmt, ...);
+
+/**
+ * @brief Output the location where the error occurred.
+ *
+ * @param[in] input Sourse input.
+ * @param[in] loc Location for the error message.
+ * @param[in] fmt Format string for the error message.
+ * @param[in] ap Variable argument list for the format string.
+ */
+void verror_at (char *loc, char *fmt, va_list ap);
+
+/**
+ * @brief Output string analysos error, and quit.
+ *
+ * @param[in] loc Location for the error message.
+ * @param[in] fmt Format string for the error message.
+ */
+void error_at (char *loc, char *fmt, ...);
+
+/**
+ * @brief Output token analysos error, and quit.
+ *
+ * @param[in] loc Location for the error message.
+ * @param[in] fmt Format string for the error message.
+ */
+void error_tok (Token *tok, char *fmt, ...);
 
 /**
  * @brief Initialize new token.
@@ -58,7 +87,7 @@ static void error (char *fmt, ...);
  * @param[in] end the end position of pointer.
  * @return Token* Pointer to the newly created token.
  */
-static Token *new_token (TokenKind kind, char *start, char *end);
+Token *new_token (TokenKind kind, char *start, char *end);
 
 /**
  * @brief Get token number if kinds is TK_NUM.
@@ -66,7 +95,7 @@ static Token *new_token (TokenKind kind, char *start, char *end);
  * @param[in] tok token
  * @return int token number
  */
-static int get_number (Token *tok);
+int get_number (Token *tok);
 
 /**
  * @brief Determines whether the value is a given value.
@@ -75,7 +104,7 @@ static int get_number (Token *tok);
  * @param[in] str string to compare
  * @return bool true if equal, false otherwise
  */
-static bool equal (Token *tok, char *str);
+bool equal (Token *tok, char *str);
 
 /**
  * @brief If whether the value is given value then skip.
@@ -84,7 +113,7 @@ static bool equal (Token *tok, char *str);
  * @param[in] str string to compare
  * @return Token* Pointer to the next token.
  */
-static Token *skip (Token *tok, char *str);
+Token *skip (Token *tok, char *str);
 
 /**
  * @brief Analysis string to the token.
@@ -94,7 +123,7 @@ static Token *skip (Token *tok, char *str);
  * @param[in] p Is pointer to the string.
  * @return Token linked list.
  */
-static Token *tokenize (char *p);
+Token *tokenize (char *p);
 
 /**
  * @brief Debug token.
@@ -103,6 +132,6 @@ static Token *tokenize (char *p);
  *
  * @param[in] tok Pointer to the token.
  */
-// static void debug_token (Token *tok);
+// void debug_token (Token *tok);
 
 #endif

@@ -5,7 +5,9 @@
  * This file achieved the main compiler function. */
 
 #include "rvcc.h"
-#include <stdio.h>
+
+// @brief Input's string.
+char *CurrentInput;
 
 /**
  * @brief The program's main entry.
@@ -23,8 +25,9 @@ main (int argc, char *argv[])
       error ("Usage: %s <expression>", argv[0]);
     }
 
+  CurrentInput = argv[1];
   // Analyze token
-  Token *tok = tokenize (argv[1]);
+  Token *tok = tokenize (CurrentInput);
 
   // Declare a main segment.
   printf ("  .globl main\n");
@@ -58,18 +61,7 @@ main (int argc, char *argv[])
   return 0;
 }
 
-static void
-error (char *fmt, ...)
-{
-  va_list ap;
-  va_start (ap, fmt);
-  vfprintf (stderr, fmt, ap);
-  fprintf (stderr, "\n");
-  va_end (ap);
-  exit (1);
-}
-
-static Token *
+Token *
 new_token (TokenKind kind, char *start, char *end)
 {
   Token *tok = calloc (1, sizeof (Token));
@@ -79,29 +71,29 @@ new_token (TokenKind kind, char *start, char *end)
   return tok;
 }
 
-static int
+int
 get_number (Token *tok)
 {
   if (tok->kind != TK_NUM)
-    error ("expect a number");
+    error_tok (tok, "expect a number");
   return tok->val;
 }
 
-static bool
+bool
 equal (Token *tok, char *str)
 {
   return memcmp (tok->loc, str, tok->len) == 0 && str[tok->len] == '\0';
 };
 
-static Token *
+Token *
 skip (Token *tok, char *str)
 {
   if (!equal (tok, str))
-    error ("expect '%s'", str);
+    error_tok (tok, "expect '%s'", str);
   return tok->next;
 }
 
-static Token *
+Token *
 tokenize (char *p)
 {
   // (HEAD) -> 1 -> 2 -> 3
@@ -138,7 +130,7 @@ tokenize (char *p)
         }
 
       // Handing unrecognizable character.
-      error ("invalid token: %c", *p);
+      error_at (p, "invalid token");
     }
 
   // Analysis end.
@@ -156,7 +148,7 @@ tokenize (char *p)
 // * Function in rvcc.h:106.
 // * Debug function for token.
 /**
-static void
+void
 debug_token (Token *tok)
 {
   int tok_num = 0;
