@@ -5,6 +5,7 @@
  * This file achieved the main compiler function. */
 
 #include "rvcc.h"
+#include <stdio.h>
 
 // @brief Input's string.
 char *CurrentInput;
@@ -29,31 +30,13 @@ main (int argc, char *argv[])
   // Analyze token
   Token *tok = tokenize (CurrentInput);
 
-  // Declare a main segment.
-  printf ("  .globl main\n");
-  // main section label.
-  printf ("main:\n");
+  // Analyze AST
+  Node *node = expr (&tok, tok);
+  dbg_print_ast (node);
+  dbg_print_tree (node, 0);
 
-  // li is aliases of addi, load a immediate into the register.
-  // `strtol` will find the first number.
-  printf ("  li a0, %d\n", get_number (tok));
-  tok = tok->next;
-
-  // Analyze
-  while (tok->kind != TK_EOF)
-    {
-      if (equal (tok, "+"))
-        {
-          tok = tok->next;
-          printf ("  addi a0, a0, %d\n", get_number (tok));
-          tok = tok->next;
-          continue;
-        }
-
-      tok = skip (tok, "-");
-      printf ("  addi a0, a0, -%d\n", get_number (tok));
-      tok = tok->next;
-    }
+  if (tok->kind != TK_EOF)
+    error_tok (tok, "extra token");
 
   // ret is aliases od `jalr x0, x1, 0`,used of return subroutines
   printf ("  ret\n");
@@ -121,7 +104,7 @@ tokenize (char *p)
         }
 
       // Analysis identifier.
-      if (*p == '+' || *p == '-')
+      if (ispunct (*p))
         {
           cur->next = new_token (TK_PUNCT, p, p + 1);
           cur = cur->next;
