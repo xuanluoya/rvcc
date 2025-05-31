@@ -15,6 +15,7 @@
 
 /**
  * @defgroup Token
+ *
  * @{
  */
 
@@ -87,7 +88,10 @@ typedef struct Node
 /** @} */
 
 /**
- * @defgroup Error Function
+ * @defgroup Error
+ *
+ * @brief Error Funtions.
+ *
  * @{
  */
 
@@ -128,7 +132,10 @@ void error_tok (Token *tok, char *fmt, ...);
 /** @} */
 
 /**
- * @defgroup Lexer Function
+ * @defgroup Lexer
+ *
+ * @brief Lexer functions.
+ *
  * @{
  */
 
@@ -190,7 +197,10 @@ void dbg_print_token (Token *tok);
 /** @} */
 
 /**
- * @defgroup AST Function
+ * @defgroup AST
+ *
+ * @brief AST Funtions
+ *
  * @{
  */
 
@@ -263,7 +273,6 @@ Node *expr (Token **rest, Token *tok);
  * @param Rest Returns the unparsed Token
  * @param Tok The current parsing start Token
  * @return The node of the abstract syntax tree
- *
  */
 Node *mul (Token **rest, Token *tok);
 
@@ -277,6 +286,38 @@ Node *mul (Token **rest, Token *tok);
  * @return Leaf node or subtree of the abstract syntax tree
  */
 Node *primary (Token **rest, Token *tok);
+
+/** @} */
+
+/**
+ * @defgroup Assembly
+ *
+ * @brief generate assembly.
+ */
+
+/**
+ * @brief Push noto stack.
+ *
+ * @param stack_deep Stack deep
+ */
+void push (int *stack_deep);
+
+/**
+ * @brief Pop stack.
+ *
+ * Make value of sp pointer pop onto reg
+ *
+ * @param reg Register name.
+ * @param stack_deep Stack deep
+ */
+void pop (char *reg, int *stack_deep);
+
+/**
+ * @brief Traverse the AST tree to generate assembly.
+ *
+ * @param node Tree node.
+ */
+void gen_exper (Node *node, int *stack_deep);
 
 /** @} */
 

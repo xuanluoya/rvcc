@@ -1,3 +1,8 @@
+/**
+ * @file parse.c
+ * @brief Implement parsing related functions.
+ */
+
 #include "rvcc.h"
 
 Node *
@@ -14,7 +19,7 @@ expr (Token **rest, Token *tok)
         }
       if (equal (tok, "-"))
         {
-          node = new_binary (ND_MUL, node, mul (&tok, tok->next));
+          node = new_binary (ND_SUB, node, mul (&tok, tok->next));
           continue;
         }
 
@@ -38,7 +43,7 @@ mul (Token **rest, Token *tok)
 
       if (equal (tok, "/"))
         {
-          node = new_binary (ND_MUL, node, primary (&tok, tok->next));
+          node = new_binary (ND_DIV, node, primary (&tok, tok->next));
           continue;
         }
 

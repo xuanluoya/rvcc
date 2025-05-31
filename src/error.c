@@ -1,3 +1,8 @@
+/**
+ * @file error.c
+ * @brief Implement error related functions.
+ */
+
 #include "rvcc.h"
 
 void

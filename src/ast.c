@@ -1,3 +1,8 @@
+/**
+ * @file ast.c
+ * @brief Implement ast related functions.
+ */
+
 #include "rvcc.h"
 
 void
@@ -48,16 +53,13 @@ dbg_print_tree (Node *node, int level)
       return;
     }
 
-  // 打印右子树，增加层级
   dbg_print_tree (node->rhs, level + 1);
 
-  // 打印当前节点的内容，按层级进行缩进
   for (int i = 0; i < level; i++)
     {
-      printf ("   "); // 每个层级缩进四个空格
+      printf ("   ");
     }
 
-  // 打印节点值
   switch (node->kind)
     {
     case ND_NUM:
@@ -80,7 +82,6 @@ dbg_print_tree (Node *node, int level)
       break;
     }
 
-  // 打印左子树，增加层级
   dbg_print_tree (node->lhs, level + 1);
 }
 
