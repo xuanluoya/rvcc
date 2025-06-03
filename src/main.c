@@ -6,6 +6,8 @@
 
 #include "rvcc.h"
 
+// #define DEBUG_AST
+
 // @brief Input's string.
 char *CurrentInput;
 
@@ -34,8 +36,14 @@ main (int argc, char *argv[])
   if (tok->kind != TK_EOF)
     error_tok (tok, "extra token");
 
-  // dbg_print_tree (node, 0);
-  // return 1;
+#ifdef DEBUG_AST
+  dbg_print_token (tok);
+  dbg_print_ast (node);
+  printf ("\n");
+  dbg_print_tree (node, 0);
+
+  return 1;
+#endif
 
   printf ("  .globl main\n");
   printf ("main:\n");
@@ -43,7 +51,7 @@ main (int argc, char *argv[])
   /** @brife Stack deepth */
   int stack_deep = 0;
 
-  gen_exper (node, &stack_deep);
+  gen_expr (node, &stack_deep);
 
   // ret is aliases od `jalr x0, x1, 0`,used of return subroutines
   printf ("  ret\n");
@@ -135,18 +143,6 @@ tokenize (char *p)
 }
 
 void
-dbg_print_token (Token *tok)
-{
-  int tok_num = 0;
-  while (tok->kind != TK_EOF)
-    {
-      printf ("(Num: %d, Kind: %d, Val: %d)\n", tok_num, tok->kind, tok->val);
-      tok_num++;
-      tok = tok->next;
-    }
-}
-
-void
 push (int *stack_deep)
 {
   // The stack usually grows downward, that is, the value of the stack pointer
@@ -171,19 +167,29 @@ pop (char *reg, int *stack_deep)
 }
 
 void
-gen_exper (Node *node, int *stack_deep)
+gen_expr (Node *node, int *stack_deep)
 {
-  // Load number onto a0.
-  if (node->kind == ND_NUM)
+  // root node
+  switch (node->kind)
     {
+    // load number onto a0
+    case ND_NUM:
       printf ("  li a0, %d\n", node->val);
       return;
+    // Invert a register
+    case ND_NEG:
+      gen_expr (node->lhs, stack_deep);
+      // neg a0, a0 is an alias for sub a0, x0, a0, i.e. a0=0-a0
+      printf ("  neg a0, a0\n");
+      return;
+    default:
+      break;
     }
 
-  gen_exper (node->rhs, stack_deep);
+  gen_expr (node->rhs, stack_deep);
   push (stack_deep);
 
-  gen_exper (node->lhs, stack_deep);
+  gen_expr (node->lhs, stack_deep);
   pop ("a1", stack_deep);
 
   // generate assembly.
@@ -204,6 +210,9 @@ gen_exper (Node *node, int *stack_deep)
     default:
       break;
     }
+
+  if (stack_deep != 0)
+    error ("The stack is not cleared");
 
   error ("invalid expression");
 }

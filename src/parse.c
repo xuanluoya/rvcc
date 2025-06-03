@@ -5,18 +5,22 @@
 
 #include "rvcc.h"
 
+// expr = mul ("+" mul | "-" mul)*
 Node *
 expr (Token **rest, Token *tok)
 {
   Node *node = mul (&tok, tok);
 
+  // ("+" mul | "-" mul)*
   for (;;)
     {
+      // "+" mul
       if (equal (tok, "+"))
         {
           node = new_binary (ND_ADD, node, mul (&tok, tok->next));
           continue;
         }
+      // "-" mul
       if (equal (tok, "-"))
         {
           node = new_binary (ND_SUB, node, mul (&tok, tok->next));
@@ -28,28 +32,47 @@ expr (Token **rest, Token *tok)
     }
 }
 
+// Multiplication
+// mul = unary ("*" unary | "/" unary)*
 Node *
 mul (Token **rest, Token *tok)
 {
-  Node *node = primary (&tok, tok);
+  // unary
+  Node *node = unary (&tok, tok);
 
+  // ("*" unary | "/" unary)*
   for (;;)
     {
       if (equal (tok, "*"))
         {
-          node = new_binary (ND_MUL, node, primary (&tok, tok->next));
+          node = new_binary (ND_MUL, node, unary (&tok, tok->next));
           continue;
         }
 
       if (equal (tok, "/"))
         {
-          node = new_binary (ND_DIV, node, primary (&tok, tok->next));
+          node = new_binary (ND_DIV, node, unary (&tok, tok->next));
           continue;
         }
 
       *rest = tok;
       return node;
     }
+}
+
+// unary = ("+" | "-") unary | primary
+Node *
+unary (Token **rest, Token *tok)
+{
+  // "+" unary
+  if (equal (tok, "+"))
+    return unary (rest, tok->next);
+
+  // "-" unary
+  if (equal (tok, "-"))
+    return new_unary (ND_NEG, unary (rest, tok->next));
+
+  return primary (rest, tok);
 }
 
 Node *

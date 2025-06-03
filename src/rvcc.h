@@ -3,8 +3,8 @@
  * @brief Include base head file and public function.
  */
 
-#ifndef RVCC_H
-#define RVCC_H
+#ifndef __RVCC_H
+#define __RVCC_H
 
 #include <ctype.h>
 #include <stdarg.h>
@@ -15,6 +15,8 @@
 
 /**
  * @defgroup Token
+ *
+ * @brief Token define.
  *
  * @{
  */
@@ -69,6 +71,7 @@ typedef enum
   ND_SUB, /**< - */
   ND_MUL, /**< * */
   ND_DIV, /**< / */
+  ND_NEG, /**< Negative sign */
   ND_NUM, /**< Int */
 } NodeKind;
 
@@ -213,6 +216,14 @@ void dbg_print_token (Token *tok);
 Node *new_node (NodeKind kind);
 
 /**
+ * @brief Create new unary tree.
+ *
+ * @param node Node kinds.
+ * @param expr The left child of the current node.
+ */
+Node *new_unary (NodeKind kind, Node *expr);
+
+/**
  * @brief Create new binary tree node.
  *
  * @param kind Node kind.
@@ -257,7 +268,7 @@ void dbg_print_tree (Node *node, int level);
 /**
  * @brief Parse addition and subtraction expressions.
  *
- * expr = mul ("+" mul | "-" mul)*
+ * expr ::= mul ("+" mul | "-" mul)*
  *
  * @param Rest returns the unparsed Token
  * @param Tok the current parsing start Token
@@ -268,7 +279,7 @@ Node *expr (Token **rest, Token *tok);
 /**
  * @brief Parse multiplication and division expressions.
  *
- * mul = primary ("*" primary | "/" primary)*
+ * mul ::= unary ("*" unary | "/" unary)*
  *
  * @param Rest Returns the unparsed Token
  * @param Tok The current parsing start Token
@@ -277,9 +288,20 @@ Node *expr (Token **rest, Token *tok);
 Node *mul (Token **rest, Token *tok);
 
 /**
+ * @brief Handling unary operations.
+ *
+ * unary ::= ("+" | "-") unary | primary
+ *
+ * @param Rest Returns the unparsed Token
+ * @param Tok The current parsing start Token
+ * @return The node of the abstract syntax tree
+ */
+Node *unary (Token **rest, Token *tok);
+
+/**
  * @brief Parse bracket expressions or numbers.
  *
- * primary = "(" expr ")" | num
+ * primary ::= "(" expr ")" | num
  *
  * @param Rest Returns the unparsed Token
  * @param Tok The current parsing start Token
@@ -287,12 +309,18 @@ Node *mul (Token **rest, Token *tok);
  */
 Node *primary (Token **rest, Token *tok);
 
+/**
+ *
+ */
+Node *unary (Token **rest, Token *tok);
+
 /** @} */
 
 /**
  * @defgroup Assembly
  *
- * @brief generate assembly.
+ * @brief Generate assembly.
+ * @{
  */
 
 /**
@@ -317,7 +345,7 @@ void pop (char *reg, int *stack_deep);
  *
  * @param node Tree node.
  */
-void gen_exper (Node *node, int *stack_deep);
+void gen_expr (Node *node, int *stack_deep);
 
 /** @} */
 
