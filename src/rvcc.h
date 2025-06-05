@@ -6,6 +6,7 @@
 #ifndef __RVCC_H
 #define __RVCC_H
 
+#include <assert.h>
 #include <ctype.h>
 #include <stdarg.h>
 #include <stdbool.h>
@@ -72,6 +73,10 @@ typedef enum
   ND_MUL, /**< * */
   ND_DIV, /**< / */
   ND_NEG, /**< Negative sign */
+  ND_EQ,  /**< == */
+  ND_NE,  /**< != */
+  ND_LT,  /**< >= */
+  ND_LE,  /**< <= */
   ND_NUM, /**< Int */
 } NodeKind;
 
@@ -143,24 +148,6 @@ void error_tok (Token *tok, char *fmt, ...);
  */
 
 /**
- * @brief Initialize new token.
- *
- * @param kind The token kind.
- * @param start position of pointer.
- * @param end the end position of pointer.
- * @return Token* Pointer to the newly created token.
- */
-Token *new_token (TokenKind kind, char *start, char *end);
-
-/**
- * @brief Get token number if kinds is TK_NUM.
- *
- * @param tok token
- * @return int token number
- */
-int get_number (Token *tok);
-
-/**
  * @brief Determines whether the value is a given value.
  *
  * @param tok token
@@ -208,40 +195,6 @@ void dbg_print_token (Token *tok);
  */
 
 /**
- * @brief Create new AST node.
- *
- * @param node Node kinds.
- * @return Create new AST node.
- */
-Node *new_node (NodeKind kind);
-
-/**
- * @brief Create new unary tree.
- *
- * @param node Node kinds.
- * @param expr The left child of the current node.
- */
-Node *new_unary (NodeKind kind, Node *expr);
-
-/**
- * @brief Create new binary tree node.
- *
- * @param kind Node kind.
- * @param lhs left-hand side of tree.
- * @param rhs right-hand side of tree.
- * @return binary tree fork
- */
-Node *new_binary (NodeKind kind, Node *lhs, Node *rhs);
-
-/**
- * @brief Create new number node.
- *
- * @param val number value.
- * @return number node.
- */
-Node *new_num (int val);
-
-/**
  * @brief Print AST.
  *
  * @param node
@@ -265,54 +218,7 @@ void dbg_print_tree (Node *node, int level);
  * @{
  */
 
-/**
- * @brief Parse addition and subtraction expressions.
- *
- * expr ::= mul ("+" mul | "-" mul)*
- *
- * @param Rest returns the unparsed Token
- * @param Tok the current parsing start Token
- * @return the root node of the abstract syntax tree
- */
-Node *expr (Token **rest, Token *tok);
-
-/**
- * @brief Parse multiplication and division expressions.
- *
- * mul ::= unary ("*" unary | "/" unary)*
- *
- * @param Rest Returns the unparsed Token
- * @param Tok The current parsing start Token
- * @return The node of the abstract syntax tree
- */
-Node *mul (Token **rest, Token *tok);
-
-/**
- * @brief Handling unary operations.
- *
- * unary ::= ("+" | "-") unary | primary
- *
- * @param Rest Returns the unparsed Token
- * @param Tok The current parsing start Token
- * @return The node of the abstract syntax tree
- */
-Node *unary (Token **rest, Token *tok);
-
-/**
- * @brief Parse bracket expressions or numbers.
- *
- * primary ::= "(" expr ")" | num
- *
- * @param Rest Returns the unparsed Token
- * @param Tok The current parsing start Token
- * @return Leaf node or subtree of the abstract syntax tree
- */
-Node *primary (Token **rest, Token *tok);
-
-/**
- *
- */
-Node *unary (Token **rest, Token *tok);
+Node *parse (Token *tok);
 
 /** @} */
 
@@ -324,28 +230,12 @@ Node *unary (Token **rest, Token *tok);
  */
 
 /**
- * @brief Push noto stack.
+ * @brief AST to risc-v Assembly
  *
+ * @param node AST node
  * @param stack_deep Stack deep
  */
-void push (int *stack_deep);
-
-/**
- * @brief Pop stack.
- *
- * Make value of sp pointer pop onto reg
- *
- * @param reg Register name.
- * @param stack_deep Stack deep
- */
-void pop (char *reg, int *stack_deep);
-
-/**
- * @brief Traverse the AST tree to generate assembly.
- *
- * @param node Tree node.
- */
-void gen_expr (Node *node, int *stack_deep);
+void codegen (Node *node, int *static_deep);
 
 /** @} */
 
